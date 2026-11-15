@@ -1,0 +1,23 @@
+# Keeps the APEX LABS Supabase project from pausing on the free plan (it pauses after about a week without
+# database activity). Once a day this calls public.keepalive(), which only returns the database time.
+# The key below is the publishable (public) key that every installed copy of APEX LAP already contains.
+name: Keep account service awake
+
+on:
+  schedule:
+    - cron: "17 3 * * *"     # every day 03:17 UTC
+  workflow_dispatch: {}
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call keepalive
+        run: |
+          curl -fsS --retry 3 --retry-delay 20 -X POST \
+            "https://kcodzxczxhzyehmozkor.supabase.co/rest/v1/rpc/keepalive" \
+            -H "apikey: sb_publishable_e0DdR0281t9OOdPfXLLK3g_b9UY2uuL" \
+            -H "Content-Type: application/json" -d '{}'
